@@ -14,8 +14,40 @@ const toggleNavbar = function () {
 
 hamburgerIcon.addEventListener("click", toggleNavbar);
 layover.addEventListener("click", toggleNavbar);
+let copyBtn;
 
 ////////////////////////////////////////////////
+
+// Copy Shortened URL to clipboard
+
+const copyBtnChange = function (copyBtn, color, text) {
+  copyBtn.style.background = color;
+  copyBtn.innerText = text;
+};
+
+const copyToClipboard = function (e) {
+  copyBtn.forEach((btn) => copyBtnChange(btn, "hsl(180, 66%, 49%)", "Copy"));
+  copyBtnChange(e.target, "hsl(180, 66%, 49%)", "Copy");
+  const shortUrlContainer = e.target.closest(".shortened-urls");
+  const shortUrl = shortUrlContainer.querySelector("p+p").innerText;
+  const inputElement = document.createElement("input");
+
+  inputElement.setAttribute("value", shortUrl);
+  document.body.appendChild(inputElement);
+  inputElement.select();
+  document.execCommand("copy");
+  inputElement.parentNode.removeChild(inputElement);
+
+  copyBtnChange(e.target, "hsl(260, 8%, 14%)", "Copied");
+};
+
+function eventListener() {
+  copyBtn = document.querySelectorAll(".copy-btn");
+  copyBtn.forEach((btn) => {
+    btn.addEventListener("click", copyToClipboard);
+  });
+}
+
 // Using ShortCo API to short the input link
 
 const urlInput = document.querySelector(".url-input-field");
@@ -35,6 +67,7 @@ const displayLinks = function (inputLink, shortLink) {
   localStorageArray.push([inputLink, shortLink]);
   saveToLocalStorage();
   urlContainer.insertAdjacentHTML("beforeend", markup);
+  eventListener();
 };
 
 const refactorInput = function (input) {
@@ -85,31 +118,5 @@ function loadLocalStorage() {
 }
 loadLocalStorage();
 
-// Copy content to clipboard
+// localStorage.clear();
 
-const copyBtn = document.querySelectorAll(".copy-btn");
-
-const copyBtnChange = function (copyBtn, color, text) {
-  copyBtn.style.background = color;
-  copyBtn.innerText = text;
-};
-
-const copyToClipboard = function (e) {
-  copyBtn.forEach((btn) => copyBtnChange(btn, "hsl(180, 66%, 49%)", "Copy"));
-  copyBtnChange(e.target, "hsl(180, 66%, 49%)", "Copy");
-  const shortUrlContainer = e.target.closest(".shortened-urls");
-  const shortUrl = shortUrlContainer.querySelector("p+p").innerText;
-  const inputElement = document.createElement("input");
-
-  inputElement.setAttribute("value", shortUrl);
-  document.body.appendChild(inputElement);
-  inputElement.select();
-  document.execCommand("copy");
-  inputElement.parentNode.removeChild(inputElement);
-
-  copyBtnChange(e.target, "hsl(260, 8%, 14%)", "Copied");
-};
-
-copyBtn.forEach((btn) => {
-  btn.addEventListener("click", copyToClipboard);
-});
